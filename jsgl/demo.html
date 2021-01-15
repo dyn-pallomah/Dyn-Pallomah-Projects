@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+	<title>My Game</title>
+	<body>
+		<script src='jsclib.js'></script>
+		<script>
+			set.pref('game');
+			set.font('font', 7, 7, 6);
+			set.size(960, 540);
+			set.cursor('crosshair');
+
+			set.scale(3);
+			set.backg('#000');
+			set.clock(()=> {
+				set.intf('font');
+				write('left-click to place a wall\nright-click to place a box\nhold space to remove', 3, 3);
+				c.opc= 0.05;
+				rect(c.mx- 12, c.my- 12, 24, 24, '#fff');
+				c.opc= 1;
+			});
+			mousedown(()=> {
+				if($button=== 0) wall.add(c.mx- 12, c.my- 12);
+				if($button=== 2) {
+					var col= ()=> Math.floor(32* (rng(7)+ 1)).toString(16);
+					box.add(c.mx- 12, c.my- 12, `#${col()}${col()}${col()}`, 0, -3);
+					if(colAny(box, box.count- 1, box) || colAny(box, box.count- 1, wall)) box.del(1, box.count- 1);
+				}
+			});
+			set.start();
+
+			sprite('box', 24, 24, ['x', 'y', 'c', 'vx', 'vy'], [], ()=> {
+				rect($x, $y, 24, 24, $c);
+			}, ()=> {
+				if(box.y[id]>= c.h) box.del(1);
+				if(kd(box, id, 32)) box.del(1);
+			});
+			physics(4, 50);
+
+			sprite('wall', 24, 24, ['x', 'y'], [], ()=> {
+				rect($x, $y, 24, 24, '#fff');
+			}, ()=> {
+				if(kd(wall, id, 32)) wall.del(1);
+			});
+			box.colWith(['wall', 'box']);
+			box.collisionAccuracy= 0;
+		</script>
+	</body>
+</html>
